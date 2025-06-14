@@ -7,12 +7,8 @@ import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 
 @RestController
-class ChatController {
-    private lateinit var chatClient: ChatClient
-    fun init(builder: ChatClient.Builder) {
-        // Initialize the chat client if needed
-        this.chatClient = builder.build()
-    }
+class ChatController(private val builder: ChatClient.Builder) {
+    private var chatClient: ChatClient = builder.build()
     @GetMapping("/chat")
     fun chat(
             @RequestParam(name = "message", required = false, defaultValue = "Hello")
