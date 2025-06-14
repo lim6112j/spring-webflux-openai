@@ -15,7 +15,7 @@ class ChatController(private val builder: ChatClient.Builder) {
             message: String?
     ): Mono<String> {
         return Mono.defer {
-            Mono.fromSupplier {
+            Mono.fromCallable {
                 chatClient.prompt(message ?: "Hello").call()
             }.subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())
             .map { response ->
