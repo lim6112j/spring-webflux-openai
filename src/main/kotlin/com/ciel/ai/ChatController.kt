@@ -15,12 +15,11 @@ class ChatController(private val builder: ChatClient.Builder) {
             message: String?
     ): Mono<String> {
         return Mono.defer {
-            val promptMono = Mono.just(chatClient.prompt(message ?: "Hello"))
-            promptMono.flatMap { prompt ->
-                Mono.fromFuture(prompt.callAsync())
-                    .map { response ->
-                        "You said: ${message ?: "No message provided"}\nAI response: ${response.content()}"
-                    }
+            Mono.fromSupplier {
+                chatClient.prompt(message ?: "Hello").call()
+            }.subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())
+            .map { response ->
+                "You said: ${message ?: "No message provided"}\nAI response: ${response.content()}"
             }
         }
     }
