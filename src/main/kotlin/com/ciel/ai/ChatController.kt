@@ -8,7 +8,11 @@ import reactor.core.publisher.Mono
 
 @RestController
 class ChatController {
-    val chatClient = ChatClient.Builder().build()
+    private lateinit var chatClient: ChatClient
+    fun init(builder: ChatClient.Builder) {
+        // Initialize the chat client if needed
+        this.chatClient = builder.build()
+    }
     @GetMapping("/chat")
     fun chat(
             @RequestParam(name = "message", required = false, defaultValue = "Hello")
