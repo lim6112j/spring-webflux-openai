@@ -14,9 +14,14 @@ class ChatController(private val builder: ChatClient.Builder) {
             @RequestParam(name = "message", required = false, defaultValue = "Hello")
             message: String?
     ): Mono<String> {
-        return Mono.fromCallable {
-            val response = chatClient.prompt(message ?: "Hello").call()
-            "You said: ${message ?: "No message provided"}\nAI response: ${response.content()}"
+        return Mono.defer {
+            val promptMono = Mono.just(chatClient.prompt(message ?: "Hello"))
+            promptMono.flatMap { prompt ->
+                Mono.fromFuture(prompt.callAsync())
+                    .map { response ->
+                        "You said: ${message ?: "No message provided"}\nAI response: ${response.content()}"
+                    }
+            }
         }
     }
 }
