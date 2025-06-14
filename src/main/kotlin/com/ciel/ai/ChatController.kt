@@ -14,13 +14,11 @@ class ChatController(private val builder: ChatClient.Builder) {
             @RequestParam(name = "message", required = false, defaultValue = "Hello")
             message: String?
     ): Mono<String> {
-        return Mono.defer {
-            Mono.fromCallable {
-                chatClient.prompt(message ?: "Hello").call()
-            }.subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())
-            .map { response ->
-                "You said: ${message ?: "No message provided"}\nAI response: ${response.content()}"
-            }
+        return Mono.fromCallable {
+            chatClient.prompt(message ?: "Hello").call()
+        }.subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())
+        .map { response ->
+            "You said: ${message ?: "No message provided"}\nAI response: ${response.content()}"
         }
     }
 }
