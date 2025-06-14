@@ -9,28 +9,26 @@ import reactor.core.publisher.Mono
 
 @RestController
 class ChatController(private val builder: ChatClient.Builder) {
-    private var chatClient: ChatClient = builder.build()
-    @GetMapping("/chat")
-    fun chat(
-            @RequestParam(name = "message", required = false, defaultValue = "Hello")
-            message: String?
-    ): Mono<String> {
-        return Mono.fromCallable { chatClient.prompt().user(message ?: "Hello").call() }
-                .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())
-                .map { response ->
-                    "You said: ${message ?: "No message provided"} \n AI response: ${response.content()}"
-                }
-    }
-    @GetMapping("/stream")
-    fun stream(
-            @RequestParam(name = "message", required = false, defaultValue = "Hello")
-            message: String?
-    ): Flux<String> {
-        return chatClient
-                .prompt()
-                .user(message ?: "Hello")
-                .stream()
-                .content()
-                .onErrorReturn("An error occurred while processing your request.")
-    }
+  private var chatClient: ChatClient = builder.build()
+  @GetMapping("/chat")
+  fun chat(
+          @RequestParam(name = "message", required = false, defaultValue = "Hello") message: String?
+  ): Mono<String> {
+    return Mono.fromCallable { chatClient.prompt().user(message ?: "Hello").call() }
+            .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())
+            .map { response ->
+              "You said: ${message ?: "No message provided"} \n AI response: ${response.content()}"
+            }
+  }
+  @GetMapping("/stream")
+  fun stream(
+          @RequestParam(name = "message", required = false, defaultValue = "Hello") message: String?
+  ): Flux<String> {
+    return chatClient
+            .prompt()
+            .user(message ?: "Hello")
+            .stream()
+            .content()
+            .onErrorReturn("An error occurred while processing your request.")
+  }
 }
